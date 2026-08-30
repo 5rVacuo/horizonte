@@ -1,0 +1,497 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Horizonte</title>
+<meta name="theme-color" content="#12161C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Horizonte">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --obsidiana:#12161C;
+  --ceniza:#1B2129;
+  --ceniza-2:#242C36;
+  --linea:#333D49;
+  --hueso:#E9E6DF;
+  --hueso-mute:#8D97A4;
+  --azufre:#E5B84B;
+  --jade:#4FA89C;
+  --brasa:#C4553D;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--obsidiana);color:var(--hueso);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:20px 16px 80px}
+
+/* ---------- eyebrow / axis-label type treatment ---------- */
+.axis{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--hueso-mute)}
+
+/* ---------- signature: the horizon ---------- */
+.horizonte{border:1px solid var(--linea);background:var(--ceniza);padding:18px 18px 8px;margin-bottom:18px}
+.h-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.h-cuenta{font-family:var(--mono);font-size:34px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.h-cuenta span{font-size:12px;font-weight:400;color:var(--hueso-mute);letter-spacing:.14em;text-transform:uppercase;margin-left:8px}
+.h-hoy{font-family:var(--mono);font-size:11px;color:var(--hueso-mute);text-align:right}
+.eje{position:relative;height:64px;margin:0 6px}
+.eje-linea{position:absolute;top:26px;left:0;right:0;height:1px;background:var(--linea)}
+.eje-pasado{position:absolute;top:26px;left:0;height:1px;background:var(--hueso-mute);opacity:.45}
+.punto{position:absolute;top:22px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:var(--ceniza);border:1.5px solid var(--hueso-mute);cursor:pointer;transition:transform .15s}
+.punto:hover,.punto:focus-visible{transform:scale(1.5);outline:none}
+.punto.critica{border-color:var(--brasa);background:var(--brasa)}
+.punto.alta{border-color:var(--azufre);background:var(--azufre)}
+.punto.hecho{background:var(--jade);border-color:var(--jade)}
+.marca-hoy{position:absolute;top:12px;bottom:22px;width:1px;background:var(--azufre);margin-left:-.5px}
+.marca-hoy::before{content:'HOY';position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--azufre)}
+.eje-meses{position:relative;height:16px}
+.mes{position:absolute;font-family:var(--mono);font-size:9.5px;color:var(--hueso-mute);transform:translateX(-50%);white-space:nowrap}
+.tooltip{min-height:34px;font-family:var(--mono);font-size:11.5px;color:var(--azufre);padding:6px 0 2px;border-top:1px solid var(--linea)}
+.tooltip em{font-style:normal;color:var(--hueso-mute)}
+
+/* ---------- tabs ---------- */
+nav{display:flex;gap:0;border-bottom:1px solid var(--linea);margin-bottom:20px;overflow-x:auto}
+nav button{background:none;border:none;border-bottom:2px solid transparent;color:var(--hueso-mute);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:11px 15px;cursor:pointer;white-space:nowrap}
+nav button:hover{color:var(--hueso)}
+nav button[aria-selected=true]{color:var(--azufre);border-bottom-color:var(--azufre)}
+nav button:focus-visible{outline:1px solid var(--azufre);outline-offset:-3px}
+
+/* ---------- generic blocks ---------- */
+.bloque{border:1px solid var(--linea);background:var(--ceniza);padding:16px;margin-bottom:16px}
+.bloque > .axis{display:block;margin-bottom:12px}
+h2{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--hueso-mute);font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}}
+
+/* ---------- racha ---------- */
+.racha-num{font-family:var(--mono);font-size:44px;font-weight:600;line-height:1;color:var(--azufre)}
+.racha-lbl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--hueso-mute);margin-top:6px}
+.serie{display:flex;align-items:flex-end;gap:2px;height:78px;margin:16px 0 4px;position:relative;border-bottom:1px solid var(--linea)}
+.meta-linea{position:absolute;left:0;right:0;border-top:1px dashed var(--linea);pointer-events:none}
+.meta-linea::after{content:'2 h';position:absolute;right:0;top:-14px;font-family:var(--mono);font-size:9px;color:var(--hueso-mute)}
+.barra{flex:1;min-width:3px;background:var(--linea);border-radius:1px 1px 0 0;transition:height .2s}
+.barra.ok{background:var(--jade)}
+.barra.parcial{background:var(--azufre);opacity:.65}
+.hoy-input{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.hoy-input label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--hueso-mute)}
+input,select,textarea{background:var(--ceniza-2);border:1px solid var(--linea);color:var(--hueso);font-family:var(--mono);font-size:13px;padding:7px 9px;border-radius:2px}
+input:focus,select:focus{outline:1px solid var(--azufre);outline-offset:-1px}
+input[type=number]{width:76px}
+button.accion{background:var(--ceniza-2);border:1px solid var(--linea);color:var(--hueso);font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:8px 13px;cursor:pointer;border-radius:2px}
+button.accion:hover{border-color:var(--azufre);color:var(--azufre)}
+
+/* ---------- listas ---------- */
+.item{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--linea)}
+.item:last-child{border-bottom:none}
+.chk{appearance:none;width:15px;height:15px;min-width:15px;border:1.5px solid var(--hueso-mute);border-radius:2px;cursor:pointer;margin-top:2px;position:relative;background:transparent}
+.chk:checked{background:var(--jade);border-color:var(--jade)}
+.chk:checked::after{content:'';position:absolute;left:4px;top:.5px;width:4px;height:8px;border:solid var(--obsidiana);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.chk:focus-visible{outline:1px solid var(--azufre);outline-offset:2px}
+.item .txt{flex:1;font-size:13.5px}
+.item.done .txt{color:var(--hueso-mute);text-decoration:line-through}
+.fecha{font-family:var(--mono);font-size:10.5px;color:var(--hueso-mute);white-space:nowrap;padding-top:2px}
+.tag{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;white-space:nowrap;align-self:flex-start;margin-top:2px}
+.tag.critica{background:rgba(196,85,61,.18);color:var(--brasa)}
+.tag.alta{background:rgba(229,184,75,.15);color:var(--azufre)}
+.tag.meta{background:rgba(79,168,156,.15);color:var(--jade)}
+.borrar{background:none;border:none;color:var(--linea);cursor:pointer;font-size:16px;line-height:1;padding:0 4px}
+.borrar:hover{color:var(--brasa)}
+.mes-sep{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--azufre);padding:16px 0 6px;border-bottom:1px solid var(--linea);margin-bottom:4px}
+.mes-sep:first-child{padding-top:0}
+.vacio{color:var(--hueso-mute);font-size:13px;padding:14px 0}
+
+/* ---------- programas ---------- */
+.prog{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--linea);flex-wrap:wrap}
+.prog .nom{flex:1;min-width:190px;font-size:13px}
+.prog .nom small{display:block;color:var(--hueso-mute);font-size:11.5px;margin-top:1px}
+.prog select{font-size:11px;padding:5px 7px}
+.ajuste{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--hueso-mute);white-space:nowrap}
+.ajuste.max{color:var(--azufre)}
+
+/* ---------- dinero ---------- */
+.saldo{font-family:var(--mono);font-size:30px;font-weight:600;letter-spacing:-.01em}
+.saldo.neg{color:var(--brasa)}
+.mov{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--linea);font-size:13px}
+.mov .m-con{flex:1}
+.mov .m-mon{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.m-mon.in{color:var(--jade)}
+.m-mon.out{color:var(--brasa)}
+.forma{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.forma input[type=text]{flex:1;min-width:130px}
+
+.guardado{position:fixed;bottom:14px;right:14px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--jade);opacity:0;transition:opacity .3s;pointer-events:none}
+.guardado.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <!-- ============ SIGNATURE: el horizonte ============ -->
+  <section class="horizonte">
+    <div class="h-top">
+      <div>
+        <div class="axis" style="margin-bottom:6px">Horizonte</div>
+        <div class="h-cuenta" id="cuenta">—<span>días a septiembre 2027</span></div>
+      </div>
+      <div class="h-hoy" id="hoyTxt"></div>
+    </div>
+    <div class="eje" id="eje">
+      <div class="eje-linea"></div>
+      <div class="eje-pasado" id="ejePasado"></div>
+    </div>
+    <div class="eje-meses" id="ejeMeses"></div>
+    <div class="tooltip" id="tip"><em>Toca un punto del eje para ver el hito.</em></div>
+  </section>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-t="hoy">Hoy</button>
+    <button role="tab" aria-selected="false" data-t="ruta">Ruta</button>
+    <button role="tab" aria-selected="false" data-t="programas">Programas</button>
+    <button role="tab" aria-selected="false" data-t="dinero">Dinero</button>
+  </nav>
+
+  <!-- ============ HOY ============ -->
+  <section id="p-hoy">
+    <div class="grid2">
+      <div class="bloque">
+        <span class="axis">Racha de Python</span>
+        <div class="racha-num" id="rachaNum">0</div>
+        <div class="racha-lbl">días seguidos ≥ 2 h</div>
+        <div class="serie" id="serie"><div class="meta-linea" style="bottom:52px"></div></div>
+        <div class="axis" style="font-size:9px">últimos 28 días</div>
+        <div class="hoy-input">
+          <label for="horas">Horas hoy</label>
+          <input type="number" id="horas" min="0" max="12" step="0.5" value="0">
+          <button class="accion" id="guardarHoras">Registrar</button>
+        </div>
+      </div>
+
+      <div class="bloque">
+        <span class="axis">Próximo vencimiento</span>
+        <div id="proximo"></div>
+      </div>
+    </div>
+
+    <div class="bloque">
+      <span class="axis">Pendientes de hoy</span>
+      <div class="forma">
+        <input type="text" id="nuevaTarea" placeholder="¿Qué tienes que hacer?">
+        <button class="accion" id="addTarea">Agregar</button>
+      </div>
+      <div id="tareas"></div>
+    </div>
+  </section>
+
+  <!-- ============ RUTA ============ -->
+  <section id="p-ruta" hidden>
+    <div class="bloque">
+      <span class="axis">Hitos — septiembre 2026 a septiembre 2027</span>
+      <div id="hitos"></div>
+    </div>
+  </section>
+
+  <!-- ============ PROGRAMAS ============ -->
+  <section id="p-programas" hidden>
+    <div class="bloque">
+      <span class="axis">22 programas — verifica cada uno en el sitio oficial</span>
+      <div id="progs"></div>
+    </div>
+  </section>
+
+  <!-- ============ DINERO ============ -->
+  <section id="p-dinero" hidden>
+    <div class="grid2">
+      <div class="bloque">
+        <span class="axis">Saldo del mes</span>
+        <div class="saldo" id="saldo">$0</div>
+        <div class="axis" id="desglose" style="margin-top:10px"></div>
+      </div>
+      <div class="bloque">
+        <span class="axis">Registrar movimiento</span>
+        <div class="forma" style="margin-top:10px">
+          <input type="text" id="mConcepto" placeholder="Concepto">
+          <input type="number" id="mMonto" placeholder="0" step="1">
+          <select id="mTipo"><option value="out">Gasto</option><option value="in">Ingreso</option></select>
+          <button class="accion" id="addMov">Guardar</button>
+        </div>
+      </div>
+    </div>
+    <div class="bloque">
+      <span class="axis">Movimientos</span>
+      <div id="movs"></div>
+    </div>
+  </section>
+
+  <div class="bloque" style="margin-top:22px">
+    <span class="axis">Respaldo</span>
+    <p style="font-size:13px;color:var(--hueso-mute);margin-bottom:12px">
+      Tus datos viven solo en este navegador. Si borras los datos del sitio o cambias de teléfono, se van.
+      Descarga un respaldo de vez en cuando.
+    </p>
+    <div class="forma">
+      <button class="accion" id="btnExport">Descargar respaldo</button>
+      <button class="accion" id="btnImport">Restaurar respaldo</button>
+      <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    </div>
+  </div>
+</div>
+
+<div class="guardado" id="flag">Guardado</div>
+
+<script>
+const INICIO = new Date(2026,7,25), FIN = new Date(2027,8,15), META = new Date(2027,8,1);
+
+const HITOS = [
+  ['2026-08-28','EGEL',                                          'critica'],
+  ['2026-09-02','Acto académico',                                'meta'],
+  ['2026-09-03','Instalar Python y hacer el primer commit',      'critica'],
+  ['2026-09-15','Tres cartas de recomendación confirmadas',      'critica'],
+  ['2026-09-30','Lista de 22 programas verificada en sitio oficial','alta'],
+  ['2026-10-14','Límite early-bird CFA mayo 2027',               'baja'],
+  ['2026-10-15','Decidir: GRE o no GRE',                         'alta'],
+  ['2026-10-31','HAR-RV y GARCH reimplementados por ti',         'critica'],
+  ['2026-11-05','Cierra registro CFA febrero 2027',              'baja'],
+  ['2026-11-30','LSTM y TFT corriendo en PyTorch',               'critica'],
+  ['2026-11-30','IELTS o TOEFL presentado',                      'critica'],
+  ['2026-12-31','Repositorio de GitHub terminado',               'critica'],
+  ['2027-01-15','Solicitudes enviadas',                          'critica'],
+  ['2027-01-31','Preprint en SSRN y arXiv',                      'alta'],
+  ['2027-02-28','Defensa de tesis',                              'critica'],
+  ['2027-03-23','Abre SECIHTI (fecha estimada)',                 'critica'],
+  ['2027-05-22','Cierra SECIHTI (fecha estimada)',               'critica'],
+  ['2027-06-30','FIDERH solicitado — no esperes a SECIHTI',      'critica'],
+  ['2027-08-07','Resultados SECIHTI (fecha estimada)',           'alta'],
+  ['2027-09-01','Inicio de maestría',                            'meta'],
+];
+
+const PROGRAMAS = [
+  ['Toulouse School of Economics','MSc Finance & Data Science (nuevo 2027)','max'],
+  ['Toulouse School of Economics','M1 Economics → M2 Econometrics & Empirical Economics','max'],
+  ['Toulouse School of Economics','M2 Statistics and Econometrics','alto'],
+  ['Erasmus Mundus','Catálogo: data science / econometría','max'],
+  ['University of Waterloo','MMath Statistics con tesis (no el MQF)','max'],
+  ['University of York','MSc Economics and Econometrics','max'],
+  ['Tinbergen Institute','MPhil Econometrics','alto'],
+  ['Paris School of Economics','MSc Analysis and Policy in Economics','alto'],
+  ['IP Paris','MSc&T Data Science for Business','alto'],
+  ['University of Glasgow','MSc Data Analytics for Economics & Finance','alto'],
+  ['Durham University','MSc Economics','alto'],
+  ['Queen Mary London','MSc por investigación','alto'],
+  ['Barcelona School of Economics','MSc Data Science / Economics','alto'],
+  ['McGill University','MA Economics con tesis','alto'],
+  ['McMaster University','MSc Statistics con tesis','alto'],
+  ['University of Alberta','MSc Statistics / Mathematical Finance','alto'],
+  ['Alemania (Secihti-DAAD)','MSc Economics / Statistics en inglés','alto'],
+  ['University of Sheffield','MSc Economics and Data Analytics','medio'],
+  ['University of Bath','MSc Economics','medio'],
+  ["Queen's University",'MA Economics','medio'],
+  ['Universidad de Sevilla','Máster en Economía / Estadística','medio'],
+  ['Paris-Dauphine','M2 MASEF / 203 (en francés)','medio'],
+];
+
+const ESTADOS = ['Por verificar','Verificado','Aplicado','Admitido','Rechazado','Descartado'];
+
+let S = {horas:{}, tareas:[], hitos:{}, progs:{}, movs:[]};
+const $=s=>document.querySelector(s), hoy=()=>new Date().toISOString().slice(0,10);
+const fmtDia=d=>new Date(d+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short'});
+const dias=(a,b)=>Math.round((b-a)/86400000);
+const peso=n=>'$'+Math.round(n).toLocaleString('es-MX');
+
+const LLAVE='horizonte:estado';
+function cargar(){
+  try{const v=localStorage.getItem(LLAVE); if(v) S=Object.assign(S,JSON.parse(v));}
+  catch(e){/* primera vez, o almacenamiento bloqueado */}
+  pintarTodo();
+}
+let t;
+function guardar(){
+  clearTimeout(t);
+  t=setTimeout(()=>{
+    try{ localStorage.setItem(LLAVE, JSON.stringify(S));
+      $('#flag').textContent='Guardado';
+      $('#flag').classList.add('on'); setTimeout(()=>$('#flag').classList.remove('on'),1100);
+    }catch(e){
+      $('#flag').textContent='No se pudo guardar. Revisa que el navegador permita almacenamiento.';
+      $('#flag').classList.add('on');
+    }
+  },350);
+}
+
+/* ---------- respaldo ---------- */
+function exportar(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='horizonte-'+hoy()+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importar(archivo){
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const d=JSON.parse(fr.result);
+      if(!d||typeof d!=='object') throw 0;
+      S=Object.assign({horas:{},tareas:[],hitos:{},progs:{},movs:[]},d);
+      guardar(); pintarTodo();
+      $('#flag').textContent='Respaldo restaurado'; $('#flag').classList.add('on');
+      setTimeout(()=>$('#flag').classList.remove('on'),1600);
+    }catch(e){
+      $('#flag').textContent='Ese archivo no es un respaldo de Horizonte';
+      $('#flag').classList.add('on'); setTimeout(()=>$('#flag').classList.remove('on'),2600);
+    }
+  };
+  fr.readAsText(archivo);
+}
+
+/* ---------- eje ---------- */
+function pos(f){const d=new Date(f+'T12:00:00'); return Math.max(0,Math.min(100,(d-INICIO)/(FIN-INICIO)*100));}
+function pintarEje(){
+  const eje=$('#eje'); eje.querySelectorAll('.punto,.marca-hoy').forEach(n=>n.remove());
+  const hp=Math.max(0,Math.min(100,(new Date()-INICIO)/(FIN-INICIO)*100));
+  $('#ejePasado').style.width=hp+'%';
+  const m=document.createElement('div'); m.className='marca-hoy'; m.style.left=hp+'%'; eje.appendChild(m);
+  HITOS.forEach(([f,txt,pr],i)=>{
+    const p=document.createElement('button');
+    p.className='punto '+(S.hitos[i]?'hecho':pr); p.style.left=pos(f)+'%';
+    p.setAttribute('aria-label',txt+' — '+fmtDia(f));
+    const mostrar=()=>{const n=dias(new Date(),new Date(f+'T12:00:00'));
+      $('#tip').innerHTML='<em>'+fmtDia(f)+' · '+(n<0?Math.abs(n)+' días atrás':n===0?'hoy':'en '+n+' días')+'</em> — '+txt;};
+    p.onmouseenter=mostrar; p.onfocus=mostrar; p.onclick=mostrar;
+    eje.appendChild(p);
+  });
+  const em=$('#ejeMeses'); em.innerHTML='';
+  ['2026-09-01','2026-12-01','2027-03-01','2027-06-01','2027-09-01'].forEach(f=>{
+    const s=document.createElement('div'); s.className='mes';
+    s.style.left=pos(f)+'%';
+    s.textContent=new Date(f+'T12:00:00').toLocaleDateString('es-MX',{month:'short',year:'2-digit'});
+    em.appendChild(s);
+  });
+  const n=dias(new Date(),META);
+  $('#cuenta').innerHTML=(n>0?n:0)+'<span>días a septiembre 2027</span>';
+  $('#hoyTxt').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+/* ---------- racha ---------- */
+function pintarRacha(){
+  const s=$('#serie'); s.querySelectorAll('.barra').forEach(n=>n.remove());
+  const hoyD=new Date();
+  for(let i=27;i>=0;i--){
+    const d=new Date(hoyD); d.setDate(d.getDate()-i);
+    const k=d.toISOString().slice(0,10), h=S.horas[k]||0;
+    const b=document.createElement('div');
+    b.className='barra '+(h>=2?'ok':h>0?'parcial':'');
+    b.style.height=Math.max(2,Math.min(78,h/3*78))+'px';
+    b.title=fmtDia(k)+': '+h+' h';
+    s.appendChild(b);
+  }
+  let r=0;
+  for(let i=0;i<400;i++){
+    const d=new Date(hoyD); d.setDate(d.getDate()-i);
+    const k=d.toISOString().slice(0,10);
+    if((S.horas[k]||0)>=2) r++; else if(i>0) break;
+  }
+  $('#rachaNum').textContent=r;
+  $('#horas').value=S.horas[hoy()]||0;
+}
+
+/* ---------- próximo ---------- */
+function pintarProximo(){
+  const n=new Date(); n.setHours(0,0,0,0);
+  const p=HITOS.map((h,i)=>({...{f:h[0],txt:h[1],pr:h[2]},i}))
+    .filter(h=>!S.hitos[h.i]&&new Date(h.f+'T12:00:00')>=n)
+    .sort((a,b)=>a.f<b.f?-1:1).slice(0,4);
+  $('#proximo').innerHTML=p.length?p.map(h=>{
+    const d=dias(n,new Date(h.f+'T12:00:00'));
+    return '<div class="item"><span class="fecha">'+(d===0?'hoy':'en '+d+' d')+'</span>'+
+      '<span class="txt">'+h.txt+'</span>'+
+      (h.pr!=='baja'?'<span class="tag '+h.pr+'">'+h.pr+'</span>':'')+'</div>';
+  }).join(''):'<div class="vacio">Nada pendiente por delante. Revisa la pestaña Ruta.</div>';
+}
+
+/* ---------- tareas ---------- */
+function pintarTareas(){
+  $('#tareas').innerHTML=S.tareas.length?S.tareas.map((t,i)=>
+    '<div class="item '+(t.d?'done':'')+'"><input type="checkbox" class="chk" data-i="'+i+'" '+(t.d?'checked':'')+'>'+
+    '<span class="txt">'+t.t.replace(/</g,'&lt;')+'</span><button class="borrar" data-x="'+i+'">×</button></div>'
+  ).join(''):'<div class="vacio">Sin pendientes. Agrega el primero arriba.</div>';
+}
+
+/* ---------- hitos ---------- */
+function pintarHitos(){
+  let out='',mes='';
+  HITOS.forEach(([f,txt,pr],i)=>{
+    const m=new Date(f+'T12:00:00').toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+    if(m!==mes){mes=m;out+='<div class="mes-sep">'+m+'</div>';}
+    out+='<div class="item '+(S.hitos[i]?'done':'')+'"><input type="checkbox" class="chk hito" data-h="'+i+'" '+(S.hitos[i]?'checked':'')+'>'+
+      '<span class="fecha">'+fmtDia(f)+'</span><span class="txt">'+txt+'</span>'+
+      (pr!=='baja'?'<span class="tag '+pr+'">'+pr+'</span>':'')+'</div>';
+  });
+  $('#hitos').innerHTML=out;
+}
+
+/* ---------- programas ---------- */
+function pintarProgs(){
+  $('#progs').innerHTML=PROGRAMAS.map(([u,p,a],i)=>
+    '<div class="prog"><span class="ajuste '+(a==='max'?'max':'')+'">'+a.toUpperCase()+'</span>'+
+    '<span class="nom">'+u+'<small>'+p+'</small></span>'+
+    '<select data-p="'+i+'">'+ESTADOS.map(e=>'<option '+((S.progs[i]||ESTADOS[0])===e?'selected':'')+'>'+e+'</option>').join('')+'</select></div>'
+  ).join('');
+}
+
+/* ---------- dinero ---------- */
+function pintarDinero(){
+  const m=hoy().slice(0,7);
+  const mm=S.movs.filter(v=>v.f.slice(0,7)===m);
+  const ing=mm.filter(v=>v.t==='in').reduce((a,b)=>a+b.m,0);
+  const gas=mm.filter(v=>v.t==='out').reduce((a,b)=>a+b.m,0);
+  const s=$('#saldo'); s.textContent=peso(ing-gas); s.className='saldo'+(ing-gas<0?' neg':'');
+  $('#desglose').textContent='Ingresos '+peso(ing)+'  ·  Gastos '+peso(gas);
+  $('#movs').innerHTML=S.movs.length?S.movs.slice().reverse().slice(0,60).map((v,ri)=>{
+    const i=S.movs.length-1-ri;
+    return '<div class="mov"><span class="fecha">'+fmtDia(v.f)+'</span><span class="m-con">'+v.c.replace(/</g,'&lt;')+'</span>'+
+      '<span class="m-mon '+v.t+'">'+(v.t==='in'?'+':'−')+peso(v.m)+'</span>'+
+      '<button class="borrar" data-mx="'+i+'">×</button></div>';
+  }).join(''):'<div class="vacio">Sin movimientos este mes.</div>';
+}
+
+function pintarTodo(){pintarEje();pintarRacha();pintarProximo();pintarTareas();pintarHitos();pintarProgs();pintarDinero();}
+
+/* ---------- eventos ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  ['hoy','ruta','programas','dinero'].forEach(t=>$('#p-'+t).hidden=(t!==b.dataset.t));
+});
+$('#guardarHoras').onclick=()=>{S.horas[hoy()]=parseFloat($('#horas').value)||0;guardar();pintarRacha();};
+$('#addTarea').onclick=()=>{const v=$('#nuevaTarea').value.trim();if(!v)return;S.tareas.push({t:v,d:false});$('#nuevaTarea').value='';guardar();pintarTareas();};
+$('#nuevaTarea').onkeydown=e=>{if(e.key==='Enter')$('#addTarea').click();};
+$('#tareas').onclick=e=>{
+  if(e.target.dataset.i!==undefined){S.tareas[e.target.dataset.i].d=e.target.checked;guardar();pintarTareas();}
+  if(e.target.dataset.x!==undefined){S.tareas.splice(e.target.dataset.x,1);guardar();pintarTareas();}
+};
+$('#hitos').onclick=e=>{if(e.target.dataset.h!==undefined){S.hitos[e.target.dataset.h]=e.target.checked;guardar();pintarHitos();pintarEje();pintarProximo();}};
+$('#progs').onchange=e=>{if(e.target.dataset.p!==undefined){S.progs[e.target.dataset.p]=e.target.value;guardar();}};
+$('#addMov').onclick=()=>{
+  const c=$('#mConcepto').value.trim(), m=parseFloat($('#mMonto').value);
+  if(!c||!m||m<=0)return;
+  S.movs.push({f:hoy(),c:c,m:m,t:$('#mTipo').value});
+  $('#mConcepto').value='';$('#mMonto').value='';guardar();pintarDinero();
+};
+$('#mMonto').onkeydown=e=>{if(e.key==='Enter')$('#addMov').click();};
+$('#movs').onclick=e=>{if(e.target.dataset.mx!==undefined){S.movs.splice(e.target.dataset.mx,1);guardar();pintarDinero();}};
+
+$('#btnExport').onclick=exportar;
+$('#btnImport').onclick=()=>$('#fileImport').click();
+$('#fileImport').onchange=e=>{if(e.target.files[0])importar(e.target.files[0]);e.target.value='';};
+
+cargar();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
